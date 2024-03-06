@@ -9,7 +9,7 @@ interface Meeting {
 }
 
 class Scheduler {
-    private meetings: Meeting[] = [];
+    meetings: Meeting[] = [];
 
     defineNewPerson(name: string, email: string): Person {
         return { personName: name, personEmail: email };
@@ -21,6 +21,10 @@ class Scheduler {
         }
         if (participants.length === 0) {
             return "Error - Participants list is empty.";
+        }
+        const scheduledBusyTimeSlots = this.meetings.map((meeting) => meeting.meetingStartTime);
+        if (this.meetings.filter((meeting) => meeting.meetingStartTime.getTime() === startTime.getTime()).length > 0) {
+            return "Error - this timeslot is already busy.";
         }
 
         const meeting: Meeting = { meetingParticipants: participants, meetingStartTime: startTime };
@@ -35,13 +39,13 @@ class Scheduler {
         );
     }
 
-    checkAvailableTimeSlotsForUsers(participants: Person[]): Date[] {
+    checkAvailableTimeSlotsForUsers(participants: Person[], dateToCheck: Date): Date[] {
         const scheduledBusyTimeSlots = this.meetings.map((meeting) => meeting.meetingStartTime);
         const availableSlots: Date[] = [];
 
         // working hours are from 8 AM to 6 PM
         for (let hour = 8; hour < 18; hour++) {
-            const potentialSlot = new Date('2024-03-05');
+            const potentialSlot = dateToCheck;
             potentialSlot.setHours(hour, 0, 0, 0);
 
             if (!scheduledBusyTimeSlots.some((busySlot) => busySlot.getTime() === potentialSlot.getTime())) {
@@ -84,11 +88,15 @@ const meeting5Time = new Date(scheduleDate.setHours(15, 0, 0, 0))
 const meeting5 = scheduler.defineNewMeeting([], meeting5Time);
 console.log('meeting with no participants', meeting5);
 
+const meeting6Time = new Date(scheduleDate.setHours(14, 0, 0, 0))
+const meeting6 = scheduler.defineNewMeeting([userJohn, userJane], meeting6Time);
+console.log('meeting on busy time', meeting6);
+
 const johnsSchedule = scheduler.listPlannedMeetingsForUser(userJohn);
 console.log('schedule for John', johnsSchedule);
 
 const janesSchedule = scheduler.listPlannedMeetingsForUser(userJane);
 console.log('schedule for Jane', janesSchedule);
 
-const availableSlots = scheduler.checkAvailableTimeSlotsForUsers([userJohn, userJane]);
+const availableSlots = scheduler.checkAvailableTimeSlotsForUsers([userJohn, userJane], scheduleDate);
 console.log('available time slots', availableSlots);
