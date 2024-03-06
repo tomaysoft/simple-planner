@@ -14,7 +14,8 @@ Script contain sample usage:
 - defines 2 meetings for both users,
 - defines meeting for single user,
 - tries to define meeting starting not at hour mark - giving error,
-- tries to define meeting with no participants added - giving error.
+- tries to define meeting with no participants added - giving error,
+- tries to define meeting on busy time slot - giving error.
 
 Messages and defined meeting are displayed in the browsers console using
 ```js
